@@ -49,7 +49,7 @@ namespace TypesSelector
             // 
             // exitButton
             // 
-            this.exitButton.Location = new System.Drawing.Point(1229, 778);
+            this.exitButton.Location = new System.Drawing.Point(649, 778);
             this.exitButton.Name = "exitButton";
             this.exitButton.Size = new System.Drawing.Size(75, 23);
             this.exitButton.TabIndex = 0;
@@ -92,7 +92,7 @@ namespace TypesSelector
             this.dataGridView1.TabIndex = 0;
             this.dataGridView1.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_ColumnHeaderMouseClick);
             this.dataGridView1.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.dataGridView1_DataBindingComplete);
-            this.dataGridView1.Click += new EventHandler(this.dataGridView1_selectedRowsButton_Click);
+            this.dataGridView1.Click += new System.EventHandler(this.dataGridView1_selectedRowsButton_Click);
             // 
             // groupBox1
             // 
@@ -129,13 +129,13 @@ namespace TypesSelector
             this.dataGridView2.TabIndex = 0;
             this.dataGridView2.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView2_ColumnHeaderMouseClick);
             this.dataGridView2.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.dataGridView2_DataBindingComplete);
-            this.dataGridView2.Click += new EventHandler(this.dataGridView2_selectedRowsButton_Click);
+            this.dataGridView2.Click += new System.EventHandler(this.dataGridView2_selectedRowsButton_Click);
             // 
             // TypesSelectorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1316, 813);
+            this.ClientSize = new System.Drawing.Size(750, 813);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.unitTypeIdentifierGroupBox);
             this.Controls.Add(this.exitButton);

@@ -36,11 +36,22 @@ namespace TypesSelector
         private RequestHandler m_Handler;
         private ExternalEvent m_ExEvent;
 
+        // La lista del singolo elemento selezionato nei DataGridView
+        private List<string> _elementList = new List<string>();
+
         // La lista degli elementi selezionati nei DataGRidView
         private List<string[]> _elementsList = new List<string[]>();
         #endregion
 
         #region Class public property
+        /// <summary>
+        /// Proprietà pubblica per accedere al valore della richiesta corrente
+        /// </summary>
+        public List<string> ElementList
+        {
+            get { return _elementList; }
+        }
+
         /// <summary>
         /// Proprietà pubblica per accedere al valore della richiesta corrente
         /// </summary>
@@ -357,11 +368,12 @@ namespace TypesSelector
         }
 
         /// <summary>
-        ///   Metodo di selezione delle righe del DataGridView1 e di raccolta dei dati al loro interno
+        ///   Metodo di selezione delle righe del DataGridView1 e di raccolta dei dati selezionati al suo interno
         /// </summary>
         /// 
         private void dataGridView1_selectedRowsButton_Click(object sender, EventArgs e)
         {
+            // Riempie la Lista con le proprieta' dell'elemento o degli elementi selezionati
             _elementsList.Clear();
 
             int selectedRowsCount = dataGridView1.Rows.GetRowCount(DataGridViewElementStates.Selected);
@@ -385,22 +397,23 @@ namespace TypesSelector
                 string[] temp = dataGridView1.SelectedRows[0].Cells[0].Value.ToString().Split('-');
                 foreach (var item in temp)
                 {
-                    _elementsList.Add(new string[] { item });
+                    _elementList.Add(item);
                 }
-                _elementsList.Add(new string[]
-                {
-                    dataGridView1.SelectedRows[0].Cells[1].Value.ToString()
-                });
+                _elementList.Add(dataGridView1.SelectedRows[0].Cells[1].Value.ToString());
             }
+
+            // Chiama il metodo nella classe RequestHandler
+            MakeRequest(RequestId.UTI);
         }
 
-
         /// <summary>
-        ///   Metodo di selezione delle righe del DataGridView1 e di raccolta dei dati al loro interno
+        ///   Metodo di selezione delle righe del DataGridView2 e di raccolta dei dati selezionati al suo interno
         /// </summary>
         /// 
         private void dataGridView2_selectedRowsButton_Click(object sender, EventArgs e)
         {
+            // Riempie la Lista con le proprieta' dell'elemento o degli elementi selezionati
+
             _elementsList.Clear();
 
             int selectedRowsCount = dataGridView2.Rows.GetRowCount(DataGridViewElementStates.Selected);
@@ -424,13 +437,13 @@ namespace TypesSelector
                 string[] temp = dataGridView2.SelectedRows[0].Cells[0].Value.ToString().Split('-');
                 foreach (var item in temp)
                 {
-                    _elementsList.Add(new string[] { item });
+                    _elementList.Add(item);
                 }
-                _elementsList.Add(new string[]
-                {
-                        dataGridView2.SelectedRows[0].Cells[1].Value.ToString()
-                });
+                _elementList.Add(dataGridView2.SelectedRows[0].Cells[1].Value.ToString());
             }
+
+            // Chiama il metodo nella classe RequestHandler
+            MakeRequest(RequestId.PTI);
         }
 
         /// <summary>

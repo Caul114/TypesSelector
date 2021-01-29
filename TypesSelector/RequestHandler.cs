@@ -53,6 +53,15 @@ namespace TypesSelector
 
         // Dichiarazione della lista dei Panel Type Identifier
         private List<string[]> _listPTI;
+
+        // Dichiarazione della lista degli Unit Type Identifier selezionati
+        private List<string> _elementListUTI;
+
+        // Dichiarazione della lista dei Panel Type Identifier selezionati
+        private List<string> _elementListPTI;
+
+        // Dichiarazazione della lista per il cambio colore
+        private List<string[]> _changeColor;
         #endregion
 
         #region Class public property
@@ -97,6 +106,9 @@ namespace TypesSelector
         {
             // Costruisce i membri dei dati per le proprietà
             _elements = new List<Element>();
+            _elementListUTI = new List<string>();
+            _elementListPTI = new List<string>();
+            _changeColor = new List<string[]>();
         }
         #endregion
 
@@ -134,10 +146,36 @@ namespace TypesSelector
                             // Chiamo i metodi per il riempimento delle liste del UTI e del PTI
                             GetListUTI(uiapp, _elements);
                             GetListPTI(uiapp, _elements);
-                            // Chima ai metodi per riempire i DataGridView
+                            // Chiama i metodi di riempimento dei DataGridView
                             _typesSelectorForm = App.thisApp.RetriveForm();
                             _typesSelectorForm.SetDataGridViewUTI();
                             _typesSelectorForm.SetDataGridViewPTI();
+                            // Cambia il Detail level in Hidden Line
+                            ChangeDetailLevel(uiapp);
+                            break;
+                        }
+                    case RequestId.UTI:
+                        {
+                            // Chiama la lista degli elementi selezionati nel DataGridView1
+                            _typesSelectorForm = App.thisApp.RetriveForm();
+                            _elementListUTI = _typesSelectorForm.ElementList;
+                            if(_elementListUTI.Count == 6)
+                            {
+                                ChangeColorPanel(uiapp, _elementListUTI);
+                            }
+                            _elementListUTI.Clear();
+                            break;
+                        }
+                    case RequestId.PTI:
+                        {
+                            // Chiama la lista degli elementi selezionati nel DataGridView2                            
+                            _typesSelectorForm = App.thisApp.RetriveForm();
+                            _elementListPTI = _typesSelectorForm.ElementList;
+                            if (_elementListPTI.Count == 5)
+                            {
+                                ChangeColorPanel(uiapp, _elementListPTI);
+                            }
+                            _elementListPTI.Clear();
                             break;
                         }
                     default:
@@ -275,6 +313,7 @@ namespace TypesSelector
                     }
                 }
             }
+
             _listPTI = stringsList;
         }
 
@@ -429,9 +468,99 @@ namespace TypesSelector
 
 
 
+        /// <summary>
+        ///   Metodo che cambia il colore dei Pannelli
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        /// <param name="uiapp">L'oggetto Applicazione di Revit</param>m>
+        /// 
+        private void ChangeColorPanel(UIApplication uiapp, List<string> valueElements)
+        {
+            // Lista degli elementi che hanno l'identificatore selezionato
+            List<Element> chosenElements = new List<Element>();
 
+            foreach (Element ele in _elements)
+            {
+                ElementType eleType = uiapp.ActiveUIDocument.Document.GetElement(ele.GetTypeId()) as ElementType;
 
+                if (eleType != null &&
+                    eleType.LookupParameter("UI-ItemCategory") != null &&
+                    eleType.LookupParameter("UI-ProjectAbbreviation") != null &&
+                    eleType.LookupParameter("UI-ItemCategory").AsString() == valueElements[0])
+                {
+                    if (eleType.LookupParameter("UI-ProjectAbbreviation").AsString() == valueElements[1] &&
+                        ele.LookupParameter("UI-Quadrant").AsString() == valueElements[2] &&
+                        ele.LookupParameter("UI-FloorNumber").AsString() == valueElements[3] &&
+                        ele.LookupParameter("UI-UnitNumber").AsString() == valueElements[04])
+                    {
+                        chosenElements.Add(ele);
+                    }
+                }
+                else if (eleType != null &&
+                    eleType.LookupParameter("PNT-ItemCategory") != null &&
+                    eleType.LookupParameter("PNT-ProjectAbbreviation") != null &&
+                    eleType.LookupParameter("PNT-WallType") != null &&
+                    eleType.LookupParameter("PNT-ItemCategory").AsString() == valueElements[0])
+                {
+                    if (eleType.LookupParameter("PNT-ProjectAbbreviation").AsString() == valueElements[1] &&
+                        eleType.LookupParameter("PNT-WallType").AsString() == valueElements[2] &&
+                        ele.LookupParameter("PNT-PanelType").AsString() == valueElements[3])
+                    {
+                        chosenElements.Add(ele);
+                    }
+                }            
+            }
 
+            // Metodo per la trasformazione del colore da System.Drawing.Color a Autodesk.Revit.DB.Color
+            System.Drawing.Color colorToConvert = System.Drawing.Color.FromName(valueElements[5]);
+            Autodesk.Revit.DB.Color newColor = new Autodesk.Revit.DB.Color(colorToConvert.R, colorToConvert.B, colorToConvert.G);
+
+            // Valoore per trasformare il Pattern in Solid (Riempimento)
+            ElementId fillPattern = new ElementId(-3000010);
+
+            OverrideGraphicSettings ogs = new OverrideGraphicSettings();
+            ogs.SetSurfaceForegroundPatternColor(newColor);
+            ogs.SetSurfaceForegroundPatternId(fillPattern);
+
+            foreach (Element el in chosenElements)
+            {
+                using (Transaction trans = new Transaction(uiapp.ActiveUIDocument.Document))
+                {
+                    trans.Start("Change Color");
+
+                    uiapp.ActiveUIDocument.Document.ActiveView.SetElementOverrides(el.Id, ogs);
+
+                    trans.Commit();
+                }
+            }
+
+            List<Element> control = chosenElements;
+        }
+
+        /// <summary>
+        /// Metodo per la modifica della Livello di Dettaglio della View
+        /// </summary>
+        private void ChangeDetailLevel(UIApplication uiapp)
+        {
+            Autodesk.Revit.DB.View viewActive = uiapp.ActiveUIDocument.Document.ActiveView;
+            Document doc = viewActive.Document;
+
+            // Cambia il Livello di Dettaglio della View attiva
+            using (Transaction tsx = new Transaction(doc))
+            {
+                tsx.Start("Change the View Detail Level");
+
+                doc.ActiveView.get_Parameter(
+                      BuiltInParameter.VIEW_DETAIL_LEVEL)
+                        .Set(1);
+
+                tsx.Commit();
+            }
+
+            //// metodo che salva il file in un percorso 
+            //SaveChanges(uiapp);
+        }
 
     }  // class
 

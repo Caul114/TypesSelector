@@ -37,6 +37,14 @@ namespace TypesSelector
         /// "Initial" request
         /// </summary>
         Initial = 1,
+        /// <summary>
+        /// "UnitTypeIdentifier" request
+        /// </summary>
+        UTI = 2,
+        /// <summary>
+        /// "PanelTypeIdentifier" request
+        /// </summary>
+        PTI = 3,
     }
 
     /// <summary>
