@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>  
+	<AddIn Type="Application">
+		<Name>TypesSelector</Name>
+		<Assembly>TypesSelector.dll</Assembly>
+		<FullClassName>TypesSelector.App</FullClassName>
+		<ClientId>1AF60236-19ED-43DC-9281-FA2220B3D5BE</ClientId>
+		<VendorId>BOLDstd</VendorId>
+		<VendorDescription>BOLDstd, http://boldstd.it/ </VendorDescription>
+	</AddIn>
+	<!--<AddIn Type="Command">
+		<Text>Command TypesSelector</Text>
+		<Description>Some description for ModelessForm_ExternalEvent</Description>
+		<Assembly>TypesSelector.dll</Assembly>
+		<FullClassName>TypesSelector.Command</FullClassName>
+		<ClientId>D820ACD9-9695-45A0-AE42-8E3645F8F441</ClientId>
+		<VendorId>BOLDstd</VendorId>
+		<VendorDescription>BOLDstd, http://boldstd.it/ </VendorDescription>
+	</AddIn>-->	
+</RevitAddIns>
