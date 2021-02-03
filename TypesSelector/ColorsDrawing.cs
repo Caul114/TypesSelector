@@ -29,12 +29,18 @@ namespace TypesSelector
                     copy = false;
                 }
 
-                if (copy)
+                if(color == "FloralWhite" ||
+                   color == "GhostWhite" ||
+                   color == "Honeydew" ||
+                   color == "Ivory" ||
+                   color == "LavenderBlush")
+                {                   
+                } 
+                else if (copy)
                 {
                     listColorsTrimmed.Add(color);
-                }
-
-                count++;
+                    count++;
+                }                
             }
 
             return listColorsTrimmed;

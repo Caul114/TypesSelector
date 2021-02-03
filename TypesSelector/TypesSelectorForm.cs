@@ -202,7 +202,7 @@ namespace TypesSelector
         }
 
         /// <summary>
-        ///   Metodo per il riempimento del DataGridView2 per i PANEL Type Ideintifier
+        ///   Metodo per il riempimento del DataGridView2 per i PANEL Type Identifier
         /// </summary>
         /// 
         public void SetDataGridViewPTI()
@@ -240,7 +240,7 @@ namespace TypesSelector
             }
             dataTable2 = list.CopyToDataTable();
 
-            // Riempie il DataGRidView
+            // Riempie il DataGridView
             dataGridView2.DataSource = dataTable2;
 
             // Colora il background della colonna Colors con il colore corrispondente

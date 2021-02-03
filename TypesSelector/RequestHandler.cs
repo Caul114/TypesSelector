@@ -141,6 +141,7 @@ namespace TypesSelector
                         }
                     case RequestId.Initial:
                         {
+
                             // Chiama il metodo di riempimento delle liste degli UTI e dei PTI
                             _elements = GetElementsfromDb(uiapp);
                             // Chiamo i metodi per il riempimento delle liste del UTI e del PTI
@@ -150,8 +151,10 @@ namespace TypesSelector
                             _typesSelectorForm = App.thisApp.RetriveForm();
                             _typesSelectorForm.SetDataGridViewUTI();
                             _typesSelectorForm.SetDataGridViewPTI();
-                            // Cambia il Detail level in Hidden Line
-                            ChangeDetailLevel(uiapp);
+                            //// Cambia il Detail level in Hidden Line
+                            //ChangeDetailLevel(uiapp);
+                            // Chiama il metodo che imposta il View Template
+                            ApplyNewViewtemplate(uiapp);
                             break;
                         }
                     case RequestId.UTI:
@@ -161,7 +164,7 @@ namespace TypesSelector
                             _elementListUTI = _typesSelectorForm.ElementList;
                             if(_elementListUTI.Count == 6)
                             {
-                                ChangeColorPanel(uiapp, _elementListUTI);
+                                ChoiceOfParameterAndChangeColor(uiapp, _elementListUTI);
                             }
                             _elementListUTI.Clear();
                             break;
@@ -173,7 +176,7 @@ namespace TypesSelector
                             _elementListPTI = _typesSelectorForm.ElementList;
                             if (_elementListPTI.Count == 5)
                             {
-                                ChangeColorPanel(uiapp, _elementListPTI);
+                                ChoiceOfParameterAndChangeColor(uiapp, _elementListPTI);
                             }
                             _elementListPTI.Clear();
                             break;
@@ -466,7 +469,31 @@ namespace TypesSelector
             return _panelTypeIdentifier;
         }
 
+        /// <summary>
+        ///   Metodo che cambia il View Template
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        /// <param name="uiapp">L'oggetto Applicazione di Revit</param>m>
+        /// 
+        public void ApplyNewViewtemplate(UIApplication uiapp)
+        {
+            Autodesk.Revit.DB.View viewTemplate = new FilteredElementCollector(uiapp.ActiveUIDocument.Document)
+                .OfClass(typeof(Autodesk.Revit.DB.View))
+                .Cast<Autodesk.Revit.DB.View>()
+                .Where(x => x.Name.Equals("3D - Curtain Wall") && x.IsTemplate == true)
+                .FirstOrDefault();
+            ElementId templateId = viewTemplate.Id;
 
+            using (Transaction trans = new Transaction(uiapp.ActiveUIDocument.Document))
+            {
+                trans.Start("Change View Template");
+                uiapp.ActiveUIDocument.Document.ActiveView.ViewTemplateId = templateId;
+                trans.Commit();
+            }
+
+            uiapp.ActiveUIDocument.RefreshActiveView();
+        }
 
         /// <summary>
         ///   Metodo che cambia il colore dei Pannelli
@@ -475,7 +502,7 @@ namespace TypesSelector
         /// </remarks>
         /// <param name="uiapp">L'oggetto Applicazione di Revit</param>m>
         /// 
-        private void ChangeColorPanel(UIApplication uiapp, List<string> valueElements)
+        private void ChoiceOfParameterAndChangeColor(UIApplication uiapp, List<string> valueElements)
         {
             // Lista degli elementi che hanno l'identificatore selezionato
             List<Element> chosenElements = new List<Element>();
@@ -501,6 +528,7 @@ namespace TypesSelector
                     eleType.LookupParameter("PNT-ItemCategory") != null &&
                     eleType.LookupParameter("PNT-ProjectAbbreviation") != null &&
                     eleType.LookupParameter("PNT-WallType") != null &&
+                    ele.LookupParameter("PNT-PanelType") != null &&
                     eleType.LookupParameter("PNT-ItemCategory").AsString() == valueElements[0])
                 {
                     if (eleType.LookupParameter("PNT-ProjectAbbreviation").AsString() == valueElements[1] &&
@@ -512,31 +540,52 @@ namespace TypesSelector
                 }            
             }
 
-            // Metodo per la trasformazione del colore da System.Drawing.Color a Autodesk.Revit.DB.Color
-            System.Drawing.Color colorToConvert = System.Drawing.Color.FromName(valueElements[5]);
-            Autodesk.Revit.DB.Color newColor = new Autodesk.Revit.DB.Color(colorToConvert.R, colorToConvert.B, colorToConvert.G);
-
-            // Valoore per trasformare il Pattern in Solid (Riempimento)
-            ElementId fillPattern = new ElementId(-3000010);
-
-            OverrideGraphicSettings ogs = new OverrideGraphicSettings();
-            ogs.SetSurfaceForegroundPatternColor(newColor);
-            ogs.SetSurfaceForegroundPatternId(fillPattern);
-
-            foreach (Element el in chosenElements)
+            using (Transaction trans = new Transaction(uiapp.ActiveUIDocument.Document))
             {
-                using (Transaction trans = new Transaction(uiapp.ActiveUIDocument.Document))
+                trans.Start("Change Color");
+
+                // Metodo per la trasformazione del colore da System.Drawing.Color a Autodesk.Revit.DB.Color
+                System.Drawing.Color colorToConvert = new System.Drawing.Color();
+                if (valueElements.Count() == 6)
                 {
-                    trans.Start("Change Color");
-
-                    uiapp.ActiveUIDocument.Document.ActiveView.SetElementOverrides(el.Id, ogs);
-
-                    trans.Commit();
+                    colorToConvert = System.Drawing.Color.FromName(valueElements[5]);
                 }
-            }
+                else if(valueElements.Count() == 5)
+                {
+                    colorToConvert = System.Drawing.Color.FromName(valueElements[4]);
+                }                
+                Autodesk.Revit.DB.Color newColor = new Autodesk.Revit.DB.Color(colorToConvert.R, colorToConvert.B, colorToConvert.G);
 
-            List<Element> control = chosenElements;
+                // Assegna il nuovo coloro all'elemento di override delle impostazioni grafiche
+                OverrideGraphicSettings ogs = new OverrideGraphicSettings();
+                ogs.SetSurfaceForegroundPatternColor(newColor);
+
+                // Estrae il valore Id per settare il Pattern come Solid FIll(Riempimento)
+                FilteredElementCollector elements = new FilteredElementCollector(uiapp.ActiveUIDocument.Document);
+                FillPatternElement solidFillPattern = elements.OfClass(typeof(FillPatternElement))
+                    .Cast<FillPatternElement>()
+                    .First(a => a.GetFillPattern().IsSolidFill);
+                ElementId solidFillPatternId = null;
+
+                if (solidFillPattern.GetFillPattern().IsSolidFill)
+                {
+                    solidFillPatternId = solidFillPattern.Id;
+                }
+
+                // Imposta l'elemento come Solid Fill
+                ogs.SetSurfaceForegroundPatternId(solidFillPatternId);
+
+                foreach (Element el in chosenElements)
+                {
+                    // Fa l'override delle impostazioni grafiche dell'elemento
+                    uiapp.ActiveUIDocument.Document.ActiveView.SetElementOverrides(el.Id, ogs);
+                }
+
+                trans.Commit();
+            }
+            //List<Element> control = chosenElements;
         }
+
 
         /// <summary>
         /// Metodo per la modifica della Livello di Dettaglio della View
