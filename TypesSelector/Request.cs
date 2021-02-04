@@ -45,6 +45,14 @@ namespace TypesSelector
         /// "PanelTypeIdentifier" request
         /// </summary>
         PTI = 3,
+        /// <summary>
+        /// "Cancel" request
+        /// </summary>
+        Cancel = 5,
+        /// <summary>
+        /// "Esc" request
+        /// </summary>
+        Esc = 10,
     }
 
     /// <summary>

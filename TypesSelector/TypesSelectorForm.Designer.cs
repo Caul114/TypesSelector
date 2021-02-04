@@ -41,6 +41,7 @@ namespace TypesSelector
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
+            this.cancelButton = new System.Windows.Forms.Button();
             this.unitTypeIdentifierGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -131,11 +132,22 @@ namespace TypesSelector
             this.dataGridView2.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.dataGridView2_DataBindingComplete);
             this.dataGridView2.Click += new System.EventHandler(this.dataGridView2_selectedRowsButton_Click);
             // 
+            // cancelButton
+            // 
+            this.cancelButton.Location = new System.Drawing.Point(609, 412);
+            this.cancelButton.Name = "cancelButton";
+            this.cancelButton.Size = new System.Drawing.Size(114, 55);
+            this.cancelButton.TabIndex = 3;
+            this.cancelButton.Text = "Cancella le selezioni";
+            this.cancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            // 
             // TypesSelectorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(750, 813);
+            this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.unitTypeIdentifierGroupBox);
             this.Controls.Add(this.exitButton);
@@ -158,5 +170,6 @@ namespace TypesSelector
         private DataGridView dataGridView1;
         private GroupBox groupBox1;
         private DataGridView dataGridView2;
+        private Button cancelButton;
     }
 }

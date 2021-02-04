@@ -15,7 +15,6 @@ namespace TypesSelector
             List<string> listColorsTrimmed = new List<string>();
 
             bool copy = false;
-            int count = 0;
 
             foreach (var color in listColors)
             {
@@ -39,7 +38,6 @@ namespace TypesSelector
                 else if (copy)
                 {
                     listColorsTrimmed.Add(color);
-                    count++;
                 }                
             }
 

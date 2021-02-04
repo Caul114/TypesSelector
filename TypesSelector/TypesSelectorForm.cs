@@ -373,7 +373,7 @@ namespace TypesSelector
         /// 
         private void dataGridView1_selectedRowsButton_Click(object sender, EventArgs e)
         {
-            // Riempie la Lista con le proprieta' dell'elemento o degli elementi selezionati
+            // Riempie la Lista con le proprietà dell'elemento o degli elementi selezionati
             _elementsList.Clear();
 
             int selectedRowsCount = dataGridView1.Rows.GetRowCount(DataGridViewElementStates.Selected);
@@ -447,12 +447,26 @@ namespace TypesSelector
         }
 
         /// <summary>
-        ///   Exit - chiude la finestra di dialogo
+        ///   Exit - imposta tutte le operazioni di chiusura della Form
         /// </summary>
         /// 
         private void exitButton_Click_1(object sender, EventArgs e)
         {
+            MakeRequest(RequestId.Esc);            
+        }
+
+        /// <summary>
+        ///   Chiude la finestra di dialogo
+        /// </summary>
+        /// 
+        public void FormClose()
+        {
             Close();
+        }
+
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            MakeRequest(RequestId.Cancel);
         }
     }  // class
 }

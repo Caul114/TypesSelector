@@ -62,6 +62,12 @@ namespace TypesSelector
 
         // Dichiarazazione della lista per il cambio colore
         private List<string[]> _changeColor;
+
+        // Dichiarazione dell'elemento di OverrideGraphicSettings
+        private OverrideGraphicSettings _ogs = new OverrideGraphicSettings();
+
+        // Dichiarazione della variabile che contiene il valore del View template
+        private string _nameViewTemplate = "";
         #endregion
 
         #region Class public property
@@ -141,10 +147,11 @@ namespace TypesSelector
                         }
                     case RequestId.Initial:
                         {
-
+                            // Assegnazione del nome del View Template
+                            _nameViewTemplate = "3D - Curtain Wall";
                             // Chiama il metodo di riempimento delle liste degli UTI e dei PTI
                             _elements = GetElementsfromDb(uiapp);
-                            // Chiamo i metodi per il riempimento delle liste del UTI e del PTI
+                            // Chiama i metodi per il riempimento delle liste del UTI e del PTI
                             GetListUTI(uiapp, _elements);
                             GetListPTI(uiapp, _elements);
                             // Chiama i metodi di riempimento dei DataGridView
@@ -179,6 +186,23 @@ namespace TypesSelector
                                 ChoiceOfParameterAndChangeColor(uiapp, _elementListPTI);
                             }
                             _elementListPTI.Clear();
+                            break;
+                        }
+                    case RequestId.Cancel:
+                        {
+                            // Cancella tutte le selezioni fatte finora
+                            CancelAllChanges(uiapp);
+                            break;
+                        }
+                    case RequestId.Esc:
+                        {
+                            // Assegnazione del nome del View Template
+                            _nameViewTemplate = "3D - Curtain Wall+Arch (Typology)";
+                            // Chiama il metodo che imposta il View Template
+                            ApplyNewViewtemplate(uiapp);
+                            // Chiude la finestra di dialogo
+                            _typesSelectorForm = App.thisApp.RetriveForm();
+                            _typesSelectorForm.FormClose();
                             break;
                         }
                     default:
@@ -477,14 +501,16 @@ namespace TypesSelector
         /// <param name="uiapp">L'oggetto Applicazione di Revit</param>m>
         /// 
         public void ApplyNewViewtemplate(UIApplication uiapp)
-        {
+        { 
+            // Scelta del Viewtemplate da mostrare con estrazione dell'Id
             Autodesk.Revit.DB.View viewTemplate = new FilteredElementCollector(uiapp.ActiveUIDocument.Document)
                 .OfClass(typeof(Autodesk.Revit.DB.View))
                 .Cast<Autodesk.Revit.DB.View>()
-                .Where(x => x.Name.Equals("3D - Curtain Wall") && x.IsTemplate == true)
+                .Where(x => x.IsTemplate == true && x.Name.Equals(_nameViewTemplate))
                 .FirstOrDefault();
             ElementId templateId = viewTemplate.Id;
 
+            // Transazione che attiva il view Template
             using (Transaction trans = new Transaction(uiapp.ActiveUIDocument.Document))
             {
                 trans.Start("Change View Template");
@@ -492,6 +518,7 @@ namespace TypesSelector
                 trans.Commit();
             }
 
+            // Refresha la View attiva in modo da attivare il cambiamento
             uiapp.ActiveUIDocument.RefreshActiveView();
         }
 
@@ -554,11 +581,12 @@ namespace TypesSelector
                 {
                     colorToConvert = System.Drawing.Color.FromName(valueElements[4]);
                 }                
-                Autodesk.Revit.DB.Color newColor = new Autodesk.Revit.DB.Color(colorToConvert.R, colorToConvert.B, colorToConvert.G);
+                Autodesk.Revit.DB.Color newColor = new Autodesk.Revit.DB.Color(colorToConvert.R, colorToConvert.G, colorToConvert.B);
 
-                // Assegna il nuovo coloro all'elemento di override delle impostazioni grafiche
-                OverrideGraphicSettings ogs = new OverrideGraphicSettings();
-                ogs.SetSurfaceForegroundPatternColor(newColor);
+                // Assegna il nuovo colore all'elemento di override delle impostazioni grafiche
+
+                _ogs.SetSurfaceForegroundPatternColor(newColor);
+                _ogs.SetSurfaceForegroundPatternVisible(true);
 
                 // Estrae il valore Id per settare il Pattern come Solid FIll(Riempimento)
                 FilteredElementCollector elements = new FilteredElementCollector(uiapp.ActiveUIDocument.Document);
@@ -573,19 +601,49 @@ namespace TypesSelector
                 }
 
                 // Imposta l'elemento come Solid Fill
-                ogs.SetSurfaceForegroundPatternId(solidFillPatternId);
+                _ogs.SetSurfaceForegroundPatternId(solidFillPatternId);
 
                 foreach (Element el in chosenElements)
                 {
                     // Fa l'override delle impostazioni grafiche dell'elemento
-                    uiapp.ActiveUIDocument.Document.ActiveView.SetElementOverrides(el.Id, ogs);
+                    uiapp.ActiveUIDocument.Document.ActiveView.SetElementOverrides(el.Id, _ogs);
+                    //Autodesk.Revit.DB.Color colorForeground = el.Category.Material.SurfaceForegroundPatternColor;
+                    Autodesk.Revit.DB.Color colorForegroundOGS = _ogs.SurfaceForegroundPatternColor;
                 }
 
                 trans.Commit();
             }
-            //List<Element> control = chosenElements;
+
+            List<Element> control = chosenElements;
         }
 
+        /// <summary>
+        ///   Metodo che ripristina il colore originale dei Pannelli
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        /// <param name="uiapp">L'oggetto Applicazione di Revit</param>m>
+        /// 
+        public void CancelAllChanges(UIApplication uiapp)
+        {
+            // Dichiara e inizializza un OverrideGraphicSettings
+            OverrideGraphicSettings ogs = new OverrideGraphicSettings();
+
+            using (Transaction trans = new Transaction(uiapp.ActiveUIDocument.Document))
+            {
+                trans.Start("Reset Color");
+
+                foreach (Element ele in _elements)
+                {
+                    // Fa l'override delle impostazioni grafiche dell'elemento
+                    uiapp.ActiveUIDocument.Document.ActiveView.SetElementOverrides(ele.Id, ogs);
+                }
+
+                trans.Commit();
+            }
+
+            var el = _elements;
+        }
 
         /// <summary>
         /// Metodo per la modifica della Livello di Dettaglio della View
