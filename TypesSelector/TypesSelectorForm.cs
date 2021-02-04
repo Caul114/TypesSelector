@@ -41,6 +41,12 @@ namespace TypesSelector
 
         // La lista degli elementi selezionati nei DataGRidView
         private List<string[]> _elementsList = new List<string[]>();
+
+        // La lista degli Unit Type Identifier
+        private List<string[]> _listUTI = new List<string[]>();
+
+        // La lista dei Panel Type Identifier
+        private List<string[]> _listPTI = new List<string[]>();
         #endregion
 
         #region Class public property
@@ -158,10 +164,10 @@ namespace TypesSelector
         public void SetDataGridViewUTI()
         {
             // Ottiene la lista degli Unit Type identifier
-            List<string[]> lista = m_Handler.ListUTI;
+            _listUTI = m_Handler.ListUTI;
 
             // La trasforma in una lista anonima
-            var stringslist = lista
+            var stringslist = _listUTI
                 .Select(arr => new {
                     UnitTypeIdentifier = arr[0],
                     Colors = arr[1]
@@ -208,10 +214,10 @@ namespace TypesSelector
         public void SetDataGridViewPTI()
         {
             // Ottiene la lista dei Panel Type identifier
-            List<string[]> lista = m_Handler.ListPTI;
+            _listPTI = m_Handler.ListPTI;
 
             // La trasforma in una lista anonima
-            var stringslist = lista
+            var stringslist = _listPTI
                 .Select(arr => new {
                     PanelTypeIdentifier = arr[0],
                     Colors = arr[1]
@@ -412,7 +418,7 @@ namespace TypesSelector
         /// 
         private void dataGridView2_selectedRowsButton_Click(object sender, EventArgs e)
         {
-            // Riempie la Lista con le proprieta' dell'elemento o degli elementi selezionati
+            // Riempie la Lista con le proprietà dell'elemento o degli elementi selezionati
 
             _elementsList.Clear();
 
@@ -447,6 +453,68 @@ namespace TypesSelector
         }
 
         /// <summary>
+        ///   Metodo che cambia il colore di tutti gli Unit Type Identifier
+        /// </summary>
+        /// 
+        private void allUTIButton_Click(object sender, EventArgs e)
+        {
+            // Ripulisce la selezione precedente
+            _elementsList.Clear();
+
+            // Riempie la lista di tutti gli Unit Type Identifier
+            for (int i = 0; i < _listUTI.Count(); i++)
+            {
+                string[] singleElement = new string[6];
+                string[] temp = dataGridView1.Rows[i].Cells["UnitTypeIdentifier"].Value.ToString().Split('-');
+                for (int j = 0; j < temp.Length; j++)
+                {
+                    singleElement[j] = temp[j];
+                }
+                singleElement[5] = dataGridView1.Rows[i].Cells["Colors"].Value.ToString();
+                _elementsList.Add(singleElement);
+                temp = null;
+            }
+
+            // Chiama il metodo in Request Handler che si occupa del cambio colore
+            MakeRequest(RequestId.AllUTI);
+        }
+
+        /// <summary>
+        ///   Metodo che cambia il colore di tutti i Panel Type Identifier
+        /// </summary>
+        /// 
+        private void allPTIButton_Click(object sender, EventArgs e)
+        {
+            // Ripulisce la selezione precedente
+            _elementsList.Clear();
+
+            // Riempie la lista di tutti gli Unit Type Identifier
+            for (int i = 0; i < _listPTI.Count(); i++)
+            {
+                string[] singleElement = new string[5];
+                string[] temp = dataGridView2.Rows[i].Cells["PanelTypeIdentifier"].Value.ToString().Split('-');
+                for (int j = 0; j < temp.Length; j++)
+                {
+                    singleElement[j] = temp[j];
+                }
+                singleElement[4] = dataGridView2.Rows[i].Cells["Colors"].Value.ToString();
+                _elementsList.Add(singleElement);
+            }
+
+            // Chiama il metodo in Request Handler che si occupa del cambio colore
+            MakeRequest(RequestId.AllPTI);
+        }
+
+        /// <summary>
+        ///   Metodo che ripristina il colore di default del View Template
+        /// </summary>
+        /// 
+        private void cancelButton_Click(object sender, EventArgs e)
+        {
+            MakeRequest(RequestId.Cancel);
+        }
+
+        /// <summary>
         ///   Exit - imposta tutte le operazioni di chiusura della Form
         /// </summary>
         /// 
@@ -464,9 +532,8 @@ namespace TypesSelector
             Close();
         }
 
-        private void cancelButton_Click(object sender, EventArgs e)
-        {
-            MakeRequest(RequestId.Cancel);
-        }
+
+
+
     }  // class
 }

@@ -42,17 +42,21 @@ namespace TypesSelector
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
             this.cancelButton = new System.Windows.Forms.Button();
+            this.allUTIButton = new System.Windows.Forms.Button();
+            this.allPTIButton = new System.Windows.Forms.Button();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.unitTypeIdentifierGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // exitButton
             // 
-            this.exitButton.Location = new System.Drawing.Point(649, 778);
+            this.exitButton.Location = new System.Drawing.Point(621, 733);
             this.exitButton.Name = "exitButton";
-            this.exitButton.Size = new System.Drawing.Size(75, 23);
+            this.exitButton.Size = new System.Drawing.Size(79, 46);
             this.exitButton.TabIndex = 0;
             this.exitButton.Text = "Exit";
             this.exitButton.UseVisualStyleBackColor = true;
@@ -134,20 +138,55 @@ namespace TypesSelector
             // 
             // cancelButton
             // 
-            this.cancelButton.Location = new System.Drawing.Point(609, 412);
+            this.cancelButton.BackColor = System.Drawing.SystemColors.AppWorkspace;
+            this.cancelButton.Location = new System.Drawing.Point(95, 121);
             this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(114, 55);
+            this.cancelButton.Size = new System.Drawing.Size(114, 62);
             this.cancelButton.TabIndex = 3;
             this.cancelButton.Text = "Cancella le selezioni";
-            this.cancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.UseVisualStyleBackColor = false;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            // 
+            // allUTIButton
+            // 
+            this.allUTIButton.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.allUTIButton.Location = new System.Drawing.Point(23, 32);
+            this.allUTIButton.Name = "allUTIButton";
+            this.allUTIButton.Size = new System.Drawing.Size(114, 62);
+            this.allUTIButton.TabIndex = 4;
+            this.allUTIButton.Text = "Colora tutti gli Unit Type Identifier";
+            this.allUTIButton.UseVisualStyleBackColor = false;
+            this.allUTIButton.Click += new System.EventHandler(this.allUTIButton_Click);
+            // 
+            // allPTIButton
+            // 
+            this.allPTIButton.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
+            this.allPTIButton.Location = new System.Drawing.Point(176, 32);
+            this.allPTIButton.Name = "allPTIButton";
+            this.allPTIButton.Size = new System.Drawing.Size(114, 62);
+            this.allPTIButton.TabIndex = 5;
+            this.allPTIButton.Text = "Colora tutti i Panel Type Identifier";
+            this.allPTIButton.UseVisualStyleBackColor = false;
+            this.allPTIButton.Click += new System.EventHandler(this.allPTIButton_Click);
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.allUTIButton);
+            this.groupBox2.Controls.Add(this.allPTIButton);
+            this.groupBox2.Controls.Add(this.cancelButton);
+            this.groupBox2.Location = new System.Drawing.Point(409, 401);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(315, 204);
+            this.groupBox2.TabIndex = 6;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Utilities";
             // 
             // TypesSelectorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(750, 813);
-            this.Controls.Add(this.cancelButton);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.unitTypeIdentifierGroupBox);
             this.Controls.Add(this.exitButton);
@@ -160,6 +199,7 @@ namespace TypesSelector
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
+            this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -171,5 +211,8 @@ namespace TypesSelector
         private GroupBox groupBox1;
         private DataGridView dataGridView2;
         private Button cancelButton;
+        private Button allUTIButton;
+        private Button allPTIButton;
+        private GroupBox groupBox2;
     }
 }
