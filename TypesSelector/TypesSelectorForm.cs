@@ -36,6 +36,9 @@ namespace TypesSelector
         private RequestHandler m_Handler;
         private ExternalEvent m_ExEvent;
 
+        // Creo un'istanza di questa form
+        public static TypesSelectorForm thisApp;
+
         // La lista del singolo elemento selezionato nei DataGridView
         private List<string> _elementList = new List<string>();
 
@@ -92,6 +95,8 @@ namespace TypesSelector
             InitializeComponent();
             m_Handler = handler;
             m_ExEvent = exEvent;
+
+            thisApp = this;
         }
 
         /// <summary>
@@ -137,7 +142,7 @@ namespace TypesSelector
         ///   riattivi anche la finestra di dialogo dopo aver terminato l'esecuzione.
         /// </remarks>
         ///
-        private void MakeRequest(RequestId request)
+        public void MakeRequest(RequestId request)
         {
             App.thisApp.DontShowFormTop();
             m_Handler.Request.Make(request);
@@ -619,7 +624,10 @@ namespace TypesSelector
         /// 
         private void exitButton_Click(object sender, EventArgs e)
         {
-            MakeRequest(RequestId.Esc);            
+            ClosingForm closingForm = new ClosingForm();
+            closingForm.Show();
+            this.DozeOff();
+            closingForm.TopMost = true;
         }
 
         /// <summary>
