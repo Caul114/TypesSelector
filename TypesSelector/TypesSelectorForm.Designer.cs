@@ -39,28 +39,30 @@ namespace TypesSelector
             this.exitButton = new System.Windows.Forms.Button();
             this.unitTypeIdentifierGroupBox = new System.Windows.Forms.GroupBox();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.panelTypeIdentifierGroupBox = new System.Windows.Forms.GroupBox();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
             this.cancelButton = new System.Windows.Forms.Button();
             this.allUTIButton = new System.Windows.Forms.Button();
             this.allPTIButton = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.unitTypeIdentifierGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            this.groupBox1.SuspendLayout();
+            this.panelTypeIdentifierGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             this.groupBox2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // exitButton
             // 
-            this.exitButton.Location = new System.Drawing.Point(621, 733);
+            this.exitButton.Location = new System.Drawing.Point(645, 733);
             this.exitButton.Name = "exitButton";
             this.exitButton.Size = new System.Drawing.Size(79, 46);
             this.exitButton.TabIndex = 0;
             this.exitButton.Text = "Exit";
             this.exitButton.UseVisualStyleBackColor = true;
-            this.exitButton.Click += new System.EventHandler(this.exitButton_Click_1);
+            this.exitButton.Click += new System.EventHandler(this.exitButton_Click);
             // 
             // unitTypeIdentifierGroupBox
             // 
@@ -71,9 +73,11 @@ namespace TypesSelector
             this.unitTypeIdentifierGroupBox.TabIndex = 1;
             this.unitTypeIdentifierGroupBox.TabStop = false;
             this.unitTypeIdentifierGroupBox.Text = "Elenco degli UnitTypeIdentifier";
+            //this.unitTypeIdentifierGroupBox.MouseLeave += new System.EventHandler(this.unitTypeIdentifierGroupBox_MouseLeave);
             // 
             // dataGridView1
             // 
+            this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToOrderColumns = true;
             this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dataGridView1.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
@@ -98,19 +102,22 @@ namespace TypesSelector
             this.dataGridView1.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView1_ColumnHeaderMouseClick);
             this.dataGridView1.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.dataGridView1_DataBindingComplete);
             this.dataGridView1.Click += new System.EventHandler(this.dataGridView1_selectedRowsButton_Click);
+            this.dataGridView1.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dataGridView1_KeyDown);
             // 
-            // groupBox1
+            // panelTypeIdentifierGroupBox
             // 
-            this.groupBox1.Controls.Add(this.dataGridView2);
-            this.groupBox1.Location = new System.Drawing.Point(409, 12);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(315, 370);
-            this.groupBox1.TabIndex = 2;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Elenco dei PanelTypeIdentifier";
+            this.panelTypeIdentifierGroupBox.Controls.Add(this.dataGridView2);
+            this.panelTypeIdentifierGroupBox.Location = new System.Drawing.Point(409, 12);
+            this.panelTypeIdentifierGroupBox.Name = "panelTypeIdentifierGroupBox";
+            this.panelTypeIdentifierGroupBox.Size = new System.Drawing.Size(315, 370);
+            this.panelTypeIdentifierGroupBox.TabIndex = 2;
+            this.panelTypeIdentifierGroupBox.TabStop = false;
+            this.panelTypeIdentifierGroupBox.Text = "Elenco dei PanelTypeIdentifier";
+            //this.panelTypeIdentifierGroupBox.MouseLeave += new EventHandler(this.panelTypeIdentifierGroupBox_MouseLeave);
             // 
             // dataGridView2
             // 
+            this.dataGridView2.AllowUserToAddRows = false;
             this.dataGridView2.AllowUserToOrderColumns = true;
             this.dataGridView2.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
             this.dataGridView2.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
@@ -124,22 +131,23 @@ namespace TypesSelector
             this.dataGridView2.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridView2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView2.GridColor = System.Drawing.Color.Black;
-            this.dataGridView2.Location = new System.Drawing.Point(24, 34);
+            this.dataGridView2.Location = new System.Drawing.Point(29, 40);
             this.dataGridView2.Name = "dataGridView2";
             this.dataGridView2.RowHeadersVisible = false;
             this.dataGridView2.RowHeadersWidth = 51;
             this.dataGridView2.RowTemplate.Height = 24;
             this.dataGridView2.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView2.Size = new System.Drawing.Size(267, 316);
+            this.dataGridView2.Size = new System.Drawing.Size(260, 296);
             this.dataGridView2.TabIndex = 0;
             this.dataGridView2.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView2_ColumnHeaderMouseClick);
             this.dataGridView2.DataBindingComplete += new System.Windows.Forms.DataGridViewBindingCompleteEventHandler(this.dataGridView2_DataBindingComplete);
             this.dataGridView2.Click += new System.EventHandler(this.dataGridView2_selectedRowsButton_Click);
+            this.dataGridView2.KeyUp += new System.Windows.Forms.KeyEventHandler(this.dataGridView2_KeyUp);
             // 
             // cancelButton
             // 
             this.cancelButton.BackColor = System.Drawing.SystemColors.AppWorkspace;
-            this.cancelButton.Location = new System.Drawing.Point(95, 121);
+            this.cancelButton.Location = new System.Drawing.Point(101, 118);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(114, 62);
             this.cancelButton.TabIndex = 3;
@@ -150,7 +158,7 @@ namespace TypesSelector
             // allUTIButton
             // 
             this.allUTIButton.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.allUTIButton.Location = new System.Drawing.Point(23, 32);
+            this.allUTIButton.Location = new System.Drawing.Point(29, 32);
             this.allUTIButton.Name = "allUTIButton";
             this.allUTIButton.Size = new System.Drawing.Size(114, 62);
             this.allUTIButton.TabIndex = 4;
@@ -161,7 +169,7 @@ namespace TypesSelector
             // allPTIButton
             // 
             this.allPTIButton.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.allPTIButton.Location = new System.Drawing.Point(176, 32);
+            this.allPTIButton.Location = new System.Drawing.Point(175, 32);
             this.allPTIButton.Name = "allPTIButton";
             this.allPTIButton.Size = new System.Drawing.Size(114, 62);
             this.allPTIButton.TabIndex = 5;
@@ -181,25 +189,41 @@ namespace TypesSelector
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Utilities";
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackColor = System.Drawing.Color.Yellow;
+            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.Location = new System.Drawing.Point(409, 675);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Padding = new System.Windows.Forms.Padding(10);
+            this.pictureBox1.Size = new System.Drawing.Size(156, 104);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox1.TabIndex = 7;
+            this.pictureBox1.TabStop = false;
+            // 
             // TypesSelectorForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(750, 813);
+            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.panelTypeIdentifierGroupBox);
             this.Controls.Add(this.unitTypeIdentifierGroupBox);
             this.Controls.Add(this.exitButton);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "TypesSelectorForm";
+            this.Padding = new System.Windows.Forms.Padding(15);
             this.Text = "BOLDstd: Visualizzatore di Tipologie";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TypesSelector_FormClosing);
             this.Load += new System.EventHandler(this.TypesSelectorForm_Load);
             this.unitTypeIdentifierGroupBox.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
-            this.groupBox1.ResumeLayout(false);
+            this.panelTypeIdentifierGroupBox.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             this.groupBox2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -208,11 +232,12 @@ namespace TypesSelector
         private Button exitButton;
         private GroupBox unitTypeIdentifierGroupBox;
         private DataGridView dataGridView1;
-        private GroupBox groupBox1;
+        private GroupBox panelTypeIdentifierGroupBox;
         private DataGridView dataGridView2;
         private Button cancelButton;
         private Button allUTIButton;
         private Button allPTIButton;
         private GroupBox groupBox2;
+        private PictureBox pictureBox1;
     }
 }

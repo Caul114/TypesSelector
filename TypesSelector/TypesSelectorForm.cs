@@ -47,6 +47,7 @@ namespace TypesSelector
 
         // La lista dei Panel Type Identifier
         private List<string[]> _listPTI = new List<string[]>();
+
         #endregion
 
         #region Class public property
@@ -66,6 +67,21 @@ namespace TypesSelector
             get { return _elementsList; }
         }
         #endregion
+
+        /// <summary>
+        ///   Snippet per nascondere l'X button
+        /// </summary>
+        /// 
+        private const int CP_NOCLOSE_BUTTON = 0x200;
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams myCp = base.CreateParams;
+                myCp.ClassStyle = myCp.ClassStyle | CP_NOCLOSE_BUTTON;
+                return myCp;
+            }
+        }
 
         /// <summary>
         ///   Costruttore della finestra di dialogo
@@ -200,7 +216,7 @@ namespace TypesSelector
             dataGridView1.DataSource = dataTable1;
 
             // Colora il background della colonna Colors con il colore corrispondente
-            for (int i = 0; i < (dataGridView1.RowCount - 1); i++)
+            for (int i = 0; i < (dataGridView1.RowCount); i++)
             {
                 dataGridView1.Rows[i].Cells[1].Style.BackColor =
                     Color.FromName(dataGridView1.Rows[i].Cells[1].Value.ToString());
@@ -250,7 +266,7 @@ namespace TypesSelector
             dataGridView2.DataSource = dataTable2;
 
             // Colora il background della colonna Colors con il colore corrispondente
-            for (int i = 0; i < (dataGridView2.RowCount - 1); i++)
+            for (int i = 0; i < (dataGridView2.RowCount); i++)
             {
                 dataGridView2.Rows[i].Cells[1].Style.BackColor =
                     Color.FromName(dataGridView2.Rows[i].Cells[1].Value.ToString());
@@ -295,7 +311,7 @@ namespace TypesSelector
                 SortOrder.Ascending : SortOrder.Descending;
 
             // Colora il background della colonna Colors con il colore corrispondente
-            for (int i = 0; i < (dataGridView1.RowCount - 1); i++)
+            for (int i = 0; i < (dataGridView1.RowCount); i++)
             {
                 dataGridView1.Rows[i].Cells[1].Style.BackColor =
                     Color.FromName(dataGridView1.Rows[i].Cells[1].Value.ToString());
@@ -353,7 +369,7 @@ namespace TypesSelector
                 SortOrder.Ascending : SortOrder.Descending;
 
             // Colora il background della colonna Colors con il colore corrispondente
-            for (int i = 0; i < (dataGridView2.RowCount - 1); i++)
+            for (int i = 0; i < (dataGridView2.RowCount); i++)
             {
                 dataGridView2.Rows[i].Cells[1].Style.BackColor =
                     Color.FromName(dataGridView2.Rows[i].Cells[1].Value.ToString());
@@ -379,13 +395,97 @@ namespace TypesSelector
         /// 
         private void dataGridView1_selectedRowsButton_Click(object sender, EventArgs e)
         {
+            if (dataGridView1.CurrentRow.Index != 0)
+            {
+                // Riempie la Lista con le proprietà dell'elemento o degli elementi selezionati
+                _elementsList.Clear();
+
+                int selectedRowsCount = dataGridView1.Rows.GetRowCount(DataGridViewElementStates.Selected);
+
+                if (selectedRowsCount > 1)
+                {
+                    for (int i = 0; i < selectedRowsCount; i++)
+                    {
+                        string[] singleElement = new string[6];
+                        string[] temp = dataGridView1.SelectedRows[i].Cells[0].Value.ToString().Split('-');
+                        for (int j = 0; j < temp.Length; j++)
+                        {
+                            singleElement[j] = temp[j];
+                        }
+                        singleElement[5] = dataGridView1.SelectedRows[i].Cells[1].Value.ToString();
+                        _elementsList.Add(singleElement);
+                    }
+                }
+                else if (selectedRowsCount == 1)
+                {
+                    string[] temp = dataGridView1.SelectedRows[0].Cells[0].Value.ToString().Split('-');
+                    foreach (var item in temp)
+                    {
+                        _elementList.Add(item);
+                    }
+                    _elementList.Add(dataGridView1.SelectedRows[0].Cells[1].Value.ToString());
+                }
+
+                // Chiama il metodo nella classe RequestHandler
+                MakeRequest(RequestId.UTI);
+            }
+        }
+
+        /// <summary>
+        ///   Metodo di selezione delle righe del DataGridView2 e di raccolta dei dati selezionati al suo interno
+        /// </summary>
+        /// 
+        private void dataGridView2_selectedRowsButton_Click(object sender, EventArgs e)
+        {
+            if (dataGridView2.CurrentRow.Index != 0)
+            {
+                // Riempie la Lista con le proprietà dell'elemento o degli elementi selezionati
+                _elementsList.Clear();
+
+                int selectedRowsCount = dataGridView2.Rows.GetRowCount(DataGridViewElementStates.Selected);
+
+                if (selectedRowsCount > 1)
+                {
+                    for (int i = 0; i < selectedRowsCount; i++)
+                    {
+                        string[] singleElement = new string[5];
+                        string[] temp = dataGridView2.SelectedRows[i].Cells[0].Value.ToString().Split('-');
+                        for (int j = 0; j < temp.Length; j++)
+                        {
+                            singleElement[j] = temp[j];
+                        }
+                        singleElement[4] = dataGridView2.SelectedRows[i].Cells[1].Value.ToString();
+                        _elementsList.Add(singleElement);
+                    }
+                }
+                else if (selectedRowsCount == 1)
+                {
+                    string[] temp = dataGridView2.SelectedRows[0].Cells[0].Value.ToString().Split('-');
+                    foreach (var item in temp)
+                    {
+                        _elementList.Add(item);
+                    }
+                    _elementList.Add(dataGridView2.SelectedRows[0].Cells[1].Value.ToString());
+                }
+
+                // Chiama il metodo nella classe RequestHandler
+                MakeRequest(RequestId.PTI);
+            }
+        }
+
+        /// <summary>
+        ///   Metodo che permette la selezione di più Unit Type Identifier con l'uso del pulsante Key
+        /// </summary>
+        /// 
+        private void dataGridView1_KeyDown(object sender, KeyEventArgs e)
+        {
             // Riempie la Lista con le proprietà dell'elemento o degli elementi selezionati
             _elementsList.Clear();
 
             int selectedRowsCount = dataGridView1.Rows.GetRowCount(DataGridViewElementStates.Selected);
 
-            if (selectedRowsCount > 1)
-            {
+            if (e.KeyCode == Keys.Control && selectedRowsCount > 1)
+            {  
                 for (int i = 0; i < selectedRowsCount; i++)
                 {
                     string[] singleElement = new string[6];
@@ -396,60 +496,41 @@ namespace TypesSelector
                     }
                     singleElement[5] = dataGridView1.SelectedRows[i].Cells[1].Value.ToString();
                     _elementsList.Add(singleElement);
-                }                
-            }
-            else if(selectedRowsCount == 1)
-            {
-                string[] temp = dataGridView1.SelectedRows[0].Cells[0].Value.ToString().Split('-');
-                foreach (var item in temp)
-                {
-                    _elementList.Add(item);
                 }
-                _elementList.Add(dataGridView1.SelectedRows[0].Cells[1].Value.ToString());
-            }
 
-            // Chiama il metodo nella classe RequestHandler
-            MakeRequest(RequestId.UTI);
+                // Chiama il metodo nella classe RequestHandler
+                MakeRequest(RequestId.UTI);
+            }
         }
 
         /// <summary>
-        ///   Metodo di selezione delle righe del DataGridView2 e di raccolta dei dati selezionati al suo interno
+        ///   Metodo che permette la selezione di più Panel Type Identifier con l'uso del pulsante Key
         /// </summary>
         /// 
-        private void dataGridView2_selectedRowsButton_Click(object sender, EventArgs e)
+        private void dataGridView2_KeyUp(object sender, KeyEventArgs e)
         {
             // Riempie la Lista con le proprietà dell'elemento o degli elementi selezionati
-
             _elementsList.Clear();
 
             int selectedRowsCount = dataGridView2.Rows.GetRowCount(DataGridViewElementStates.Selected);
 
-            if (selectedRowsCount > 1)
+            if (e.KeyCode == Keys.Control && selectedRowsCount > 1)
             {
                 for (int i = 0; i < selectedRowsCount; i++)
                 {
-                    string[] singleElement = new string[5];
+                    string[] singleElement = new string[6];
                     string[] temp = dataGridView2.SelectedRows[i].Cells[0].Value.ToString().Split('-');
                     for (int j = 0; j < temp.Length; j++)
                     {
                         singleElement[j] = temp[j];
                     }
-                    singleElement[4] = dataGridView2.SelectedRows[i].Cells[1].Value.ToString();
+                    singleElement[5] = dataGridView2.SelectedRows[i].Cells[1].Value.ToString();
                     _elementsList.Add(singleElement);
                 }
-            }
-            else if (selectedRowsCount == 1)
-            {
-                string[] temp = dataGridView2.SelectedRows[0].Cells[0].Value.ToString().Split('-');
-                foreach (var item in temp)
-                {
-                    _elementList.Add(item);
-                }
-                _elementList.Add(dataGridView2.SelectedRows[0].Cells[1].Value.ToString());
-            }
 
-            // Chiama il metodo nella classe RequestHandler
-            MakeRequest(RequestId.PTI);
+                // Chiama il metodo nella classe RequestHandler
+                MakeRequest(RequestId.PTI);
+            }
         }
 
         /// <summary>
@@ -506,6 +587,24 @@ namespace TypesSelector
         }
 
         /// <summary>
+        ///   Metodo che cancella la selezione in dataGridView1
+        /// </summary>
+        /// 
+        public void clearSelection_dataGridView1()
+        {
+            dataGridView1.ClearSelection();
+        }
+
+        /// <summary>
+        ///   Metodo che cancella la selezione in dataGridView2
+        /// </summary>
+        /// 
+        public void clearSelection_dataGridView2()
+        {
+            dataGridView2.ClearSelection();
+        }
+
+        /// <summary>
         ///   Metodo che ripristina il colore di default del View Template
         /// </summary>
         /// 
@@ -518,9 +617,18 @@ namespace TypesSelector
         ///   Exit - imposta tutte le operazioni di chiusura della Form
         /// </summary>
         /// 
-        private void exitButton_Click_1(object sender, EventArgs e)
+        private void exitButton_Click(object sender, EventArgs e)
         {
             MakeRequest(RequestId.Esc);            
+        }
+
+        /// <summary>
+        ///   Exit - Evento che si genera quando si chiude la Form
+        /// </summary>
+        /// 
+
+        private void TypesSelector_FormClosing(object sender, FormClosingEventArgs e)
+        {
         }
 
         /// <summary>
@@ -528,12 +636,9 @@ namespace TypesSelector
         /// </summary>
         /// 
         public void FormClose()
-        {
+        {            
             Close();
         }
-
-
-
 
     }  // class
 }

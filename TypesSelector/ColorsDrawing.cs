@@ -28,11 +28,13 @@ namespace TypesSelector
                     copy = false;
                 }
 
-                if(color == "FloralWhite" ||
-                   color == "GhostWhite" ||
-                   color == "Honeydew" ||
-                   color == "Ivory" ||
-                   color == "LavenderBlush")
+                if(color == "FloralWhite"
+                   || color == "GhostWhite"
+                   || color == "Honeydew"
+                   || color == "Ivory"
+                   || color == "LavenderBlush"
+                   || color == "SeaShell"
+                   )
                 {                   
                 } 
                 else if (copy)

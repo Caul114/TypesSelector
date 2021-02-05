@@ -60,6 +60,12 @@ namespace TypesSelector
         // Dichiarazione della lista dei Panel Type Identifier selezionati
         private List<string> _elementListPTI;
 
+        // Dichiarazione della lista degli Unit Type Identifier selezionati
+        private List<string[]> _elementsListUTI;
+
+        // Dichiarazione della lista dei Panel Type Identifier selezionati
+        private List<string[]> _elementsListPTI;
+
         // Dichiarazione della lista di tutti gli Unit Type Identifier sezionati
         private List<string[]> _elementListAllUTI;
 
@@ -120,6 +126,8 @@ namespace TypesSelector
             _elements = new List<Element>();
             _elementListUTI = new List<string>();
             _elementListPTI = new List<string>();
+            _elementsListUTI = new List<string[]>();
+            _elementsListPTI = new List<string[]>();
             _changeColor = new List<string[]>();
         }
         #endregion
@@ -164,8 +172,9 @@ namespace TypesSelector
                             _typesSelectorForm = App.thisApp.RetriveForm();
                             _typesSelectorForm.SetDataGridViewUTI();
                             _typesSelectorForm.SetDataGridViewPTI();
-                            //// Cambia il Detail level in Hidden Line
-                            //ChangeDetailLevel(uiapp);
+                            // Chiama i metodi che cancellano le selezioni automatiche nei DataGridView
+                            _typesSelectorForm.clearSelection_dataGridView1();
+                            _typesSelectorForm.clearSelection_dataGridView2();
                             // Chiama il metodo che imposta il View Template
                             ApplyNewViewtemplate(uiapp);
                             break;
@@ -175,11 +184,18 @@ namespace TypesSelector
                             // Chiama la lista degli elementi selezionati nel DataGridView1
                             _typesSelectorForm = App.thisApp.RetriveForm();
                             _elementListUTI = _typesSelectorForm.ElementList;
-                            if(_elementListUTI.Count == 6)
+                            _elementsListUTI = _typesSelectorForm.ElementsList;
+                            if(_elementListUTI.Count != 0)
                             {
-                                ChoiceOfParameterAndChangeColor(uiapp, _elementListUTI);
+                                ChoiceOfParameterAndChangeColor(uiapp, _elementListUTI);                                
                             }
+                            else if(_elementsListUTI.Count != 0)
+                            {
+                                ChangeColorOfAllPanels(uiapp, _elementsListUTI);                                
+                            }
+                            // Cancella il contenuto delle liste
                             _elementListUTI.Clear();
+                            _elementsListUTI.Clear();
                             break;
                         }
                     case RequestId.PTI:
@@ -187,11 +203,18 @@ namespace TypesSelector
                             // Chiama la lista degli elementi selezionati nel DataGridView2                            
                             _typesSelectorForm = App.thisApp.RetriveForm();
                             _elementListPTI = _typesSelectorForm.ElementList;
-                            if (_elementListPTI.Count == 5)
+                            _elementsListPTI = _typesSelectorForm.ElementsList;
+                            if (_elementListPTI.Count != 0)
                             {
                                 ChoiceOfParameterAndChangeColor(uiapp, _elementListPTI);
                             }
+                            else if(_elementsListPTI.Count != 0)
+                            {
+                                ChangeColorOfAllPanels(uiapp, _elementsListPTI);
+                            }
+                            // Cancella il contenuto delle liste
                             _elementListPTI.Clear();
+                            _elementsListPTI.Clear();
                             break;
                         }
                     case RequestId.AllUTI:
@@ -220,10 +243,16 @@ namespace TypesSelector
                         {
                             // Cancella tutte le selezioni fatte finora
                             CancelAllChanges(uiapp);
+                            // Chiama i metodi che cancellano le selezioni automatiche nei DataGridView
+                            _typesSelectorForm = App.thisApp.RetriveForm();
+                            _typesSelectorForm.clearSelection_dataGridView1();
+                            _typesSelectorForm.clearSelection_dataGridView2();
                             break;
                         }
                     case RequestId.Esc:
                         {
+                            // Cancella tutte le selezioni fatte finora
+                            CancelAllChanges(uiapp);
                             // Assegnazione del nome del View Template
                             _nameViewTemplate = "3D - Curtain Wall+Arch (Typology)";
                             // Chiama il metodo che imposta il View Template
