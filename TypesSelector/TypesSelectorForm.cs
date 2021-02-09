@@ -241,7 +241,8 @@ namespace TypesSelector
             var stringslist = _listPTI
                 .Select(arr => new {
                     PanelTypeIdentifier = arr[0],
-                    Colors = arr[1]
+                    Qty = arr[1],
+                    Colors = arr[2]
                 }).ToArray();
 
             // Crea un DataTable (utile per fare poi l'ordinamento per colonne)
@@ -249,6 +250,11 @@ namespace TypesSelector
             dataTable2.Columns.Add(new DataColumn
             {
                 ColumnName = "PanelTypeIdentifier",
+                DataType = typeof(String)
+            });
+            dataTable2.Columns.Add(new DataColumn
+            {
+                ColumnName = "Qty",
                 DataType = typeof(String)
             });
             dataTable2.Columns.Add(new DataColumn
@@ -262,6 +268,7 @@ namespace TypesSelector
             {
                 var row = dataTable2.NewRow();
                 row.SetField<string>("PanelTypeIdentifier", x.PanelTypeIdentifier);
+                row.SetField<string>("Qty", x.Qty);
                 row.SetField<string>("Colors", x.Colors);
                 list.Add(row);
             }
@@ -273,8 +280,8 @@ namespace TypesSelector
             // Colora il background della colonna Colors con il colore corrispondente
             for (int i = 0; i < (dataGridView2.RowCount); i++)
             {
-                dataGridView2.Rows[i].Cells[1].Style.BackColor =
-                    Color.FromName(dataGridView2.Rows[i].Cells[1].Value.ToString());
+                dataGridView2.Rows[i].Cells[2].Style.BackColor =
+                    Color.FromName(dataGridView2.Rows[i].Cells[2].Value.ToString());
             }
         }
 
@@ -376,8 +383,8 @@ namespace TypesSelector
             // Colora il background della colonna Colors con il colore corrispondente
             for (int i = 0; i < (dataGridView2.RowCount); i++)
             {
-                dataGridView2.Rows[i].Cells[1].Style.BackColor =
-                    Color.FromName(dataGridView2.Rows[i].Cells[1].Value.ToString());
+                dataGridView2.Rows[i].Cells[2].Style.BackColor =
+                    Color.FromName(dataGridView2.Rows[i].Cells[2].Value.ToString());
             }
         }
 
@@ -400,7 +407,7 @@ namespace TypesSelector
         /// 
         private void dataGridView1_selectedRowsButton_Click(object sender, EventArgs e)
         {
-            if (dataGridView1.CurrentRow.Index != 0)
+            if (dataGridView1.CurrentRow.Index != -1)
             {
                 // Riempie la Lista con le proprietà dell'elemento o degli elementi selezionati
                 _elementsList.Clear();
@@ -442,7 +449,7 @@ namespace TypesSelector
         /// 
         private void dataGridView2_selectedRowsButton_Click(object sender, EventArgs e)
         {
-            if (dataGridView2.CurrentRow.Index != 0)
+            if (dataGridView2.CurrentRow.Index != -1)
             {
                 // Riempie la Lista con le proprietà dell'elemento o degli elementi selezionati
                 _elementsList.Clear();
@@ -459,7 +466,7 @@ namespace TypesSelector
                         {
                             singleElement[j] = temp[j];
                         }
-                        singleElement[4] = dataGridView2.SelectedRows[i].Cells[1].Value.ToString();
+                        singleElement[4] = dataGridView2.SelectedRows[i].Cells[2].Value.ToString();
                         _elementsList.Add(singleElement);
                     }
                 }
@@ -470,7 +477,7 @@ namespace TypesSelector
                     {
                         _elementList.Add(item);
                     }
-                    _elementList.Add(dataGridView2.SelectedRows[0].Cells[1].Value.ToString());
+                    _elementList.Add(dataGridView2.SelectedRows[0].Cells[2].Value.ToString());
                 }
 
                 // Chiama il metodo nella classe RequestHandler
@@ -529,7 +536,7 @@ namespace TypesSelector
                     {
                         singleElement[j] = temp[j];
                     }
-                    singleElement[5] = dataGridView2.SelectedRows[i].Cells[1].Value.ToString();
+                    singleElement[5] = dataGridView2.SelectedRows[i].Cells[2].Value.ToString();
                     _elementsList.Add(singleElement);
                 }
 
@@ -579,9 +586,16 @@ namespace TypesSelector
             {
                 string[] singleElement = new string[5];
                 string[] temp = dataGridView2.Rows[i].Cells["PanelTypeIdentifier"].Value.ToString().Split('-');
-                for (int j = 0; j < temp.Length; j++)
+                for (int j = 0; j < singleElement.Length - 1; j++)
                 {
-                    singleElement[j] = temp[j];
+                    if(temp[j] != "")
+                    {
+                        singleElement[j] = temp[j];
+                    } else
+                    {
+                        singleElement[j] = "xxx";
+                    }
+                    
                 }
                 singleElement[4] = dataGridView2.Rows[i].Cells["Colors"].Value.ToString();
                 _elementsList.Add(singleElement);

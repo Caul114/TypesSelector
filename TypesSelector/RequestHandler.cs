@@ -162,7 +162,7 @@ namespace TypesSelector
                     case RequestId.Initial:
                         {
                             // Assegnazione del nome del View Template
-                            _nameViewTemplate = "3D - Curtain Wall";
+                            _nameViewTemplate = "3D - Curtain Wall LOD200(Blank)";
                             // Chiama il metodo di riempimento delle liste degli UTI e dei PTI
                             _elements = GetElementsfromDb(uiapp);
                             // Chiama i metodi per il riempimento delle liste del UTI e del PTI
@@ -254,9 +254,11 @@ namespace TypesSelector
                             // Cancella tutte le selezioni fatte finora
                             CancelAllChanges(uiapp);
                             // Assegnazione del nome del View Template
-                            _nameViewTemplate = "3D - Curtain Wall+Arch (Typology)";
+                            _nameViewTemplate = "3D - Curtain Wall LOD300(AbacoGlass)";
                             // Chiama il metodo che imposta il View Template
                             ApplyNewViewtemplate(uiapp);
+                            // Cambia lo stile di visualizzazione 
+                            ChangeVisualStyle(uiapp);
                             // Chiude la finestra di dialogo
                             _typesSelectorForm = App.thisApp.RetriveForm();
                             _typesSelectorForm.FormClose();
@@ -334,12 +336,12 @@ namespace TypesSelector
                     tempUTI.Add(uti);
                 }
             }
-
             // Rimuove i duplicati
             newUTI = RemoveDuplicates(tempUTI);
             // Li ordina in modo ascendente
             newUTI.OrderBy(x => x);
             
+            // Riempie la stringlist con i valori corrispondenti
             for (int i = 0; i < newUTI.Count; i++)
             {
                 for (int j = 0; j < listColors.Count; j++)
@@ -368,6 +370,7 @@ namespace TypesSelector
             List<string> newPTI = new List<string>();
             List<string> listColors = ColorsDrawing.GetColors();
 
+            var listTemp = new List<string[]>();
 
             foreach (Element el in elements)
             {
@@ -382,20 +385,23 @@ namespace TypesSelector
                 }
             }
 
-            // Rimuove i duplicati
-            newPTI = RemoveDuplicates(tempPTI);
             // Li ordina in modo ascendente
-            newPTI.OrderBy(x => x);
+            tempPTI.OrderBy(x => x);
 
-            for (int i = 0; i < newPTI.Count; i++)
+            // Li raggruppa
+            var group = tempPTI.GroupBy(pti => pti);
+
+            int i = 0;
+            foreach (var item in group)
             {
-                for (int j = 100; j < listColors.Count; j++)
+                for (int j =2000; j < listColors.Count; j++)
                 {
-                    if (i == (j - 100))
+                    if(i == (j - 2000))
                     {
-                        stringsList.Add(new[] { newPTI[i], listColors[j] });
+                        stringsList.Add(new[] { item.Key, Convert.ToString(item.Count()),  listColors[j]});
                     }
                 }
+                i++;
             }
 
             _listPTI = stringsList;
@@ -567,6 +573,12 @@ namespace TypesSelector
                 .FirstOrDefault();
             ElementId templateId = viewTemplate.Id;
 
+            var viewTemplate3D = new FilteredElementCollector(uiapp.ActiveUIDocument.Document)
+                .OfClass(typeof(Autodesk.Revit.DB.View3D))
+                .Cast<Autodesk.Revit.DB.View3D>()
+                .Where(v => v.IsTemplate == true)
+                .ToList();
+
             // Transazione che attiva il view Template
             using (Transaction trans = new Transaction(uiapp.ActiveUIDocument.Document))
             {
@@ -577,6 +589,27 @@ namespace TypesSelector
 
             // Refresha la View attiva in modo da attivare il cambiamento
             uiapp.ActiveUIDocument.RefreshActiveView();
+        }
+
+        /// <summary>
+        /// Metodo per la modifica della Livello di Dettaglio della View
+        /// </summary>
+        private void ChangeVisualStyle(UIApplication uiapp)
+        {
+            Autodesk.Revit.DB.View viewActive = uiapp.ActiveUIDocument.Document.ActiveView;
+            Document doc = viewActive.Document;
+
+            // Cambia il Livello di Dettaglio della View attiva
+            using (Transaction tsx = new Transaction(doc))
+            {
+                tsx.Start("Change the Visual Style Level");
+
+                doc.ActiveView.get_Parameter(
+                      BuiltInParameter.MODEL_GRAPHICS_STYLE)
+                        .Set(4);
+
+                tsx.Commit();
+            }
         }
 
         /// <summary>

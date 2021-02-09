@@ -15,32 +15,45 @@ namespace TypesSelector
             List<string> listColorsTrimmed = new List<string>();
 
             bool copy = false;
+            bool esc = true;
+            int count = 1;
 
-            foreach (var color in listColors)
+            while(esc)
             {
-                if (color == "Beige")
+                foreach (var color in listColors)
                 {
-                    copy = true;
-                }
+                    if (color == "Beige")
+                    {
+                        copy = true;
+                    }
 
-                if (color == "White")
-                {
-                    copy = false;
-                }
+                    if (color == "White")
+                    {
+                        copy = false;
+                    }
 
-                if(color == "FloralWhite"
-                   || color == "GhostWhite"
-                   || color == "Honeydew"
-                   || color == "Ivory"
-                   || color == "LavenderBlush"
-                   || color == "SeaShell"
-                   )
-                {                   
-                } 
-                else if (copy)
-                {
-                    listColorsTrimmed.Add(color);
-                }                
+                    if (color == "FloralWhite"
+                       || color == "GhostWhite"
+                       || color == "Honeydew"
+                       || color == "Ivory"
+                       || color == "LavenderBlush"
+                       || color == "MintCream"
+                       || color == "SeaShell"
+                       || color == "Snow"
+                       )
+                    {
+                    }
+                    else if (copy)
+                    {
+                        listColorsTrimmed.Add(color);
+                    }
+
+                    if(count == 20)
+                    {
+                        esc = false;
+                    }
+                }
+                count++;
             }
 
             return listColorsTrimmed;
