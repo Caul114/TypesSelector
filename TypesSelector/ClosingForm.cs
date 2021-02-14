@@ -12,8 +12,6 @@ namespace TypesSelector
 {
     public partial class ClosingForm : Form
     {
-        // Inizializzo la Form base
-        private TypesSelectorForm _typesSelectorForm;
         public ClosingForm()
         {
             InitializeComponent();

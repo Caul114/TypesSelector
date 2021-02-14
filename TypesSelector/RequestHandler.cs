@@ -26,6 +26,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -78,8 +79,11 @@ namespace TypesSelector
         // Dichiarazione dell'elemento di OverrideGraphicSettings
         private OverrideGraphicSettings _ogs = new OverrideGraphicSettings();
 
-        // Dichiarazione della variabile che contiene il valore del View template
+        // Dichiarazione della variabile che contiene il nome del View template
         private string _nameViewTemplate = "";
+
+        // Dichiarazione della variabile che contiene l'id del View template
+        private ElementId _idViewTemplate;
         #endregion
 
         #region Class public property
@@ -161,8 +165,8 @@ namespace TypesSelector
                         }
                     case RequestId.Initial:
                         {
-                            // Assegnazione del nome del View Template
-                            _nameViewTemplate = "3D - Curtain Wall LOD200(Blank)";
+                            //// Assegnazione del nome del View Template
+                            //_nameViewTemplate = "3D - Curtain Wall LOD200(Blank)";
                             // Chiama il metodo di riempimento delle liste degli UTI e dei PTI
                             _elements = GetElementsfromDb(uiapp);
                             // Chiama i metodi per il riempimento delle liste del UTI e del PTI
@@ -176,7 +180,7 @@ namespace TypesSelector
                             _typesSelectorForm.clearSelection_dataGridView1();
                             _typesSelectorForm.clearSelection_dataGridView2();
                             // Chiama il metodo che imposta il View Template
-                            ApplyNewViewtemplate(uiapp);
+                            ApplyNewViewtemplate(uiapp, 0);
                             break;
                         }
                     case RequestId.UTI:
@@ -253,12 +257,12 @@ namespace TypesSelector
                         {
                             // Cancella tutte le selezioni fatte finora
                             CancelAllChanges(uiapp);
-                            // Assegnazione del nome del View Template
-                            _nameViewTemplate = "3D - Curtain Wall LOD300(AbacoGlass)";
+                            //// Assegnazione del nome del View Template
+                            //_nameViewTemplate = "3D - Curtain Wall LOD300(AbacoGlass)";
                             // Chiama il metodo che imposta il View Template
-                            ApplyNewViewtemplate(uiapp);
-                            // Cambia lo stile di visualizzazione 
-                            ChangeVisualStyle(uiapp);
+                            ApplyNewViewtemplate(uiapp, -1);
+                            //// Cambia lo stile di visualizzazione 
+                            //ChangeVisualStyle(uiapp);
                             // Chiude la finestra di dialogo
                             _typesSelectorForm = App.thisApp.RetriveForm();
                             _typesSelectorForm.FormClose();
@@ -563,28 +567,54 @@ namespace TypesSelector
         /// </remarks>
         /// <param name="uiapp">L'oggetto Applicazione di Revit</param>m>
         /// 
-        public void ApplyNewViewtemplate(UIApplication uiapp)
-        { 
+        public void ApplyNewViewtemplate(UIApplication uiapp, int indexDetail)
+        {
+            UIDocument uidoc = uiapp.ActiveUIDocument;
+            Document doc = uidoc.Document;
+
             // Scelta del Viewtemplate da mostrare con estrazione dell'Id
             Autodesk.Revit.DB.View viewTemplate = new FilteredElementCollector(uiapp.ActiveUIDocument.Document)
                 .OfClass(typeof(Autodesk.Revit.DB.View))
                 .Cast<Autodesk.Revit.DB.View>()
-                .Where(x => x.IsTemplate == true && x.Name.Equals(_nameViewTemplate))
+                .Where(x => x.IsTemplate == true && x.Name.Contains("Blank"))
                 .FirstOrDefault();
             ElementId templateId = viewTemplate.Id;
 
-            var viewTemplate3D = new FilteredElementCollector(uiapp.ActiveUIDocument.Document)
-                .OfClass(typeof(Autodesk.Revit.DB.View3D))
-                .Cast<Autodesk.Revit.DB.View3D>()
-                .Where(v => v.IsTemplate == true)
-                .ToList();
-
-            // Transazione che attiva il view Template
-            using (Transaction trans = new Transaction(uiapp.ActiveUIDocument.Document))
+            // Se non è già stato riempito il nome del view template, lo fa
+            if (_idViewTemplate == null)
             {
-                trans.Start("Change View Template");
-                uiapp.ActiveUIDocument.Document.ActiveView.ViewTemplateId = templateId;
-                trans.Commit();
+                _idViewTemplate = doc.ActiveView.ViewTemplateId;
+                Parameter par = doc.ActiveView.get_Parameter(
+                        BuiltInParameter.MODEL_GRAPHICS_STYLE);
+                string value = par.Definition.Name;
+            }
+
+            if (indexDetail == -1)
+            {
+                // Transazione che attiva il view Template
+                using (Transaction trans = new Transaction(uiapp.ActiveUIDocument.Document))
+                {
+                    trans.Start("Change View Template to Original");
+
+                    uiapp.ActiveUIDocument.Document
+                        .ActiveView.ViewTemplateId = _idViewTemplate;
+
+                    doc.ActiveView.get_Parameter(
+                          BuiltInParameter.MODEL_GRAPHICS_STYLE)
+                            .Set(4);
+
+                    trans.Commit();
+                }
+            }
+            else
+            {
+                // Transazione che attiva il view Template
+                using (Transaction trans = new Transaction(uiapp.ActiveUIDocument.Document))
+                {
+                    trans.Start("Change View Template to Blank");
+                    uiapp.ActiveUIDocument.Document.ActiveView.ViewTemplateId = templateId;
+                    trans.Commit();
+                }
             }
 
             // Refresha la View attiva in modo da attivare il cambiamento
@@ -592,9 +622,9 @@ namespace TypesSelector
         }
 
         /// <summary>
-        /// Metodo per la modifica della Livello di Dettaglio della View
+        /// Metodo per la modifica della Livello di Stile della View
         /// </summary>
-        private void ChangeVisualStyle(UIApplication uiapp)
+        private void ChangeVisualAndDetailStyle(UIApplication uiapp, int indexStyle, int indexDetail)
         {
             Autodesk.Revit.DB.View viewActive = uiapp.ActiveUIDocument.Document.ActiveView;
             Document doc = viewActive.Document;
@@ -602,11 +632,15 @@ namespace TypesSelector
             // Cambia il Livello di Dettaglio della View attiva
             using (Transaction tsx = new Transaction(doc))
             {
-                tsx.Start("Change the Visual Style Level");
+                tsx.Start("Change the Visual and the Detail Style Level");
 
-                doc.ActiveView.get_Parameter(
+                var style = doc.ActiveView.get_Parameter(
                       BuiltInParameter.MODEL_GRAPHICS_STYLE)
-                        .Set(4);
+                        .Set(indexStyle);
+
+                //var index = doc.ActiveView.get_Parameter(
+                //      BuiltInParameter.VIEW_DETAIL_LEVEL)
+                //        .Set(indexDetail);
 
                 tsx.Commit();
             }
