@@ -72,7 +72,7 @@ namespace TypesSelector
             this.unitTypeIdentifierGroupBox.Size = new System.Drawing.Size(378, 783);
             this.unitTypeIdentifierGroupBox.TabIndex = 1;
             this.unitTypeIdentifierGroupBox.TabStop = false;
-            this.unitTypeIdentifierGroupBox.Text = "Elenco degli Unit Identifier";
+            this.unitTypeIdentifierGroupBox.Text = "Elenco degli Codici Posizionali";
             // 
             // dataGridView1
             // 
@@ -114,7 +114,7 @@ namespace TypesSelector
             this.panelTypeIdentifierGroupBox.Size = new System.Drawing.Size(417, 370);
             this.panelTypeIdentifierGroupBox.TabIndex = 2;
             this.panelTypeIdentifierGroupBox.TabStop = false;
-            this.panelTypeIdentifierGroupBox.Text = "Elenco dei Panel Type Identifier";
+            this.panelTypeIdentifierGroupBox.Text = "Elenco dei Codici Tipologia";
             // 
             // dataGridView2
             // 
@@ -162,11 +162,11 @@ namespace TypesSelector
             // allUTIButton
             // 
             this.allUTIButton.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
-            this.allUTIButton.Location = new System.Drawing.Point(240, 40);
+            this.allUTIButton.Location = new System.Drawing.Point(238, 40);
             this.allUTIButton.Name = "allUTIButton";
-            this.allUTIButton.Size = new System.Drawing.Size(127, 62);
+            this.allUTIButton.Size = new System.Drawing.Size(131, 62);
             this.allUTIButton.TabIndex = 4;
-            this.allUTIButton.Text = "Colora tutti gli Unit Type Identifier";
+            this.allUTIButton.Text = "Colora tutti i Codici Posizionali";
             this.allUTIButton.UseVisualStyleBackColor = false;
             this.allUTIButton.Click += new System.EventHandler(this.allUTIButton_Click);
             // 
@@ -175,9 +175,9 @@ namespace TypesSelector
             this.allPTIButton.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.allPTIButton.Location = new System.Drawing.Point(45, 40);
             this.allPTIButton.Name = "allPTIButton";
-            this.allPTIButton.Size = new System.Drawing.Size(127, 62);
+            this.allPTIButton.Size = new System.Drawing.Size(131, 62);
             this.allPTIButton.TabIndex = 5;
-            this.allPTIButton.Text = "Colora tutti i Panel Type Identifier";
+            this.allPTIButton.Text = "Colora tutti i Codici Tipologia";
             this.allPTIButton.UseVisualStyleBackColor = false;
             this.allPTIButton.Click += new System.EventHandler(this.allPTIButton_Click);
             // 

@@ -167,7 +167,7 @@ namespace TypesSelector
                         {
                             //// Assegnazione del nome del View Template
                             //_nameViewTemplate = "3D - Curtain Wall LOD200(Blank)";
-                            // Chiama il metodo di riempimento delle liste degli UTI e dei PTI
+                            // Chiama il metodo che cattura tutti i Curtain Panels
                             _elements = GetElementsfromDb(uiapp);
                             // Chiama i metodi per il riempimento delle liste del UTI e del PTI
                             GetListUTI(uiapp, _elements);
@@ -245,8 +245,8 @@ namespace TypesSelector
                         }
                     case RequestId.Cancel:
                         {
-                            // Cancella tutte le selezioni fatte finora
-                            CancelAllChanges(uiapp);
+                            // Riporta i colori al Bianco
+                            ChangeColorToBlank(uiapp);
                             // Chiama i metodi che cancellano le selezioni automatiche nei DataGridView
                             _typesSelectorForm = App.thisApp.RetriveForm();
                             _typesSelectorForm.clearSelection_dataGridView1();
@@ -315,7 +315,61 @@ namespace TypesSelector
         }
 
         /// <summary>
-        ///   Metodo riempie le liste con gli UNIT Type Identifier
+        ///   Metodo che riempie le liste con i CODICI TIPOLOGIA
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        /// <param name="uiapp">L'oggetto Applicazione di Revit</param>m>
+        /// 
+        private void GetListPTI(UIApplication uiapp, List<Element> elements)
+        {
+            List<string[]> stringsList = new List<string[]>();
+            List<string> tempPTI = new List<string>();
+            List<string> newPTI = new List<string>();
+            List<string> listColors = ColorsDrawing.GetColors();
+
+            var listTemp = new List<string[]>();
+
+            foreach (Element el in elements)
+            {
+                ElementId eTypeId = el.GetTypeId();
+                ElementType eType = uiapp.ActiveUIDocument.Document.GetElement(eTypeId) as ElementType;
+
+                //string pti = PickPanelTypeIdentifier(uiapp, el);
+                string pti = PickCodeTypologie(uiapp, el);
+
+                if (pti != null && !pti.Contains("xx") && eType != null)
+                {
+                    tempPTI.Add(pti);
+                }
+            }
+
+            // Li ordina in modo ascendente
+            tempPTI.OrderBy(x => x);
+
+            // Li raggruppa
+            var group = tempPTI.GroupBy(pti => pti);
+
+
+            // Assegna il colore e assegna i valori alla lista di stringhe[]
+            int i = 0;
+            foreach (var item in group)
+            {
+                for (int j = 2000; j < listColors.Count; j++)
+                {
+                    if (i == (j - 2000))
+                    {
+                        stringsList.Add(new[] { item.Key, Convert.ToString(item.Count()), listColors[j] });
+                    }
+                }
+                i++;
+            }
+
+            _listPTI = stringsList;
+        }
+
+        /// <summary>
+        ///   Metodo che riempie le liste con i CODICI POSIZIONALI
         /// </summary>
         /// <remarks>
         /// </remarks>
@@ -360,56 +414,6 @@ namespace TypesSelector
             _listUTI = stringsList;
         }
 
-        /// <summary>
-        ///   Metodo che riempie le liste con i PANEL Type Identifier
-        /// </summary>
-        /// <remarks>
-        /// </remarks>
-        /// <param name="uiapp">L'oggetto Applicazione di Revit</param>m>
-        /// 
-        private void GetListPTI(UIApplication uiapp, List<Element> elements)
-        {
-            List<string[]> stringsList = new List<string[]>();
-            List<string> tempPTI = new List<string>();
-            List<string> newPTI = new List<string>();
-            List<string> listColors = ColorsDrawing.GetColors();
-
-            var listTemp = new List<string[]>();
-
-            foreach (Element el in elements)
-            {
-                ElementId eTypeId = el.GetTypeId();
-                ElementType eType = uiapp.ActiveUIDocument.Document.GetElement(eTypeId) as ElementType;
-
-                string pti = PickPanelTypeIdentifier(uiapp, el);
-                
-                if (!pti.Contains("xx") && eType != null)
-                {
-                    tempPTI.Add(pti);
-                }
-            }
-
-            // Li ordina in modo ascendente
-            tempPTI.OrderBy(x => x);
-
-            // Li raggruppa
-            var group = tempPTI.GroupBy(pti => pti);
-
-            int i = 0;
-            foreach (var item in group)
-            {
-                for (int j =2000; j < listColors.Count; j++)
-                {
-                    if(i == (j - 2000))
-                    {
-                        stringsList.Add(new[] { item.Key, Convert.ToString(item.Count()),  listColors[j]});
-                    }
-                }
-                i++;
-            }
-
-            _listPTI = stringsList;
-        }
 
         /// <summary>
         ///   Metodo che rimuove i duplicati
@@ -427,6 +431,28 @@ namespace TypesSelector
                     newList.Add(str);
             }
             return newList;
+        }
+
+        // <summary>
+        ///   La subroutine di selezione di un elemento che torna il valore stringa dell'Unit Identifier
+        /// </summary>
+        /// <remarks>
+        /// Il valore dell'UnitIdentifier e' composto dai Parametri dell'elemento UI-ItemCategory, 
+        /// UI-ProjectAbbreviation, UI-Quadrant, UI-FloorNumber e UI-UnitNumber
+        /// </remarks>
+        /// <param name="uiapp">L'oggetto Applicazione di Revit</param>m>
+        /// 
+        private string PickCodeTypologie(UIApplication uiapp, Element ele)
+        {
+            string typologieCode = string.Empty;
+
+            if (ele.LookupParameter("BOLDDistinta") != null)
+            {
+                Parameter par = ele.LookupParameter("BOLDDistinta");
+                typologieCode = par.AsString();
+            }
+
+            return typologieCode;
         }
 
         // <summary>
@@ -572,14 +598,6 @@ namespace TypesSelector
             UIDocument uidoc = uiapp.ActiveUIDocument;
             Document doc = uidoc.Document;
 
-            // Scelta del Viewtemplate da mostrare con estrazione dell'Id
-            Autodesk.Revit.DB.View viewTemplate = new FilteredElementCollector(uiapp.ActiveUIDocument.Document)
-                .OfClass(typeof(Autodesk.Revit.DB.View))
-                .Cast<Autodesk.Revit.DB.View>()
-                .Where(x => x.IsTemplate == true && x.Name.Contains("Blank"))
-                .FirstOrDefault();
-            ElementId templateId = viewTemplate.Id;
-
             // Se non è già stato riempito il nome del view template, lo fa
             if (_idViewTemplate == null)
             {
@@ -589,15 +607,41 @@ namespace TypesSelector
                 string value = par.Definition.Name;
             }
 
+            // Scelta del Viewtemplate BLANK da mostrare con estrazione dell'Id
+            Autodesk.Revit.DB.View viewTemplate = new FilteredElementCollector(uiapp.ActiveUIDocument.Document)
+                .OfClass(typeof(Autodesk.Revit.DB.View))
+                .Cast<Autodesk.Revit.DB.View>()
+                .Where(x => x.IsTemplate == true && x.Name.Contains("Blank"))
+                .FirstOrDefault();
+
+            //// Metodo che visualizza i View Template ed i loro Id
+            //var allViewTemplate = new FilteredElementCollector(uiapp.ActiveUIDocument.Document)
+            //    .OfClass(typeof(Autodesk.Revit.DB.View))
+            //    .Cast<Autodesk.Revit.DB.View>()
+            //    .Where(x => x.IsTemplate)
+            //    .Select(x => new { x.Name, x.Id})
+            //    .ToList();
+
+            // Scelta del Viewtemplate LOD200 da mostrare con estrazione dell'Id
+            Autodesk.Revit.DB.View viewTemplateLOD200 = new FilteredElementCollector(uiapp.ActiveUIDocument.Document)
+                .OfClass(typeof(Autodesk.Revit.DB.View))
+                .Cast<Autodesk.Revit.DB.View>()
+                .Where(x => x.IsTemplate == true && x.Name.Contains("LOD200"))
+                .FirstOrDefault();
+
+            // Seleziona il tipo di template che appare
             if (indexDetail == -1)
             {
-                // Transazione che attiva il view Template
+                // Transazione che attiva il view Template ORIGINAL
+                ApplyViewTemplateToActiveView(uiapp, _idViewTemplate);
+
+                //// Refresha la View attiva in modo da attivare il cambiamento
+                //uiapp.ActiveUIDocument.RefreshActiveView();
+
+                // Transazione che attiva il View Style con Shaded with Edges
                 using (Transaction trans = new Transaction(uiapp.ActiveUIDocument.Document))
                 {
-                    trans.Start("Change View Template to Original");
-
-                    uiapp.ActiveUIDocument.Document
-                        .ActiveView.ViewTemplateId = _idViewTemplate;
+                    trans.Start("Change View Style to Shaded with Edges");
 
                     doc.ActiveView.get_Parameter(
                           BuiltInParameter.MODEL_GRAPHICS_STYLE)
@@ -605,20 +649,58 @@ namespace TypesSelector
 
                     trans.Commit();
                 }
+
+                //// Refresha la View attiva in modo da attivare il cambiamento
+                //uiapp.ActiveUIDocument.RefreshActiveView();
+            }
+            else if (viewTemplate == null)
+            {
+                ElementId templateId = viewTemplateLOD200.Id;
+                // Transazione che attiva il view Template LOD200
+                ApplyViewTemplateToActiveView(uiapp, templateId);
+
+                //// Refresha la View attiva in modo da attivare il cambiamento
+                //uiapp.ActiveUIDocument.RefreshActiveView();
+
+                // Transazione che attiva il view Template HIDDEN LINE
+                using (Transaction trans = new Transaction(uiapp.ActiveUIDocument.Document))
+                {
+                    trans.Start("Change View Template to Hidden Line");
+
+                    doc.ActiveView.get_Parameter(
+                          BuiltInParameter.MODEL_GRAPHICS_STYLE)
+                            .Set(2);
+
+                    trans.Commit();
+                }
+
+                // Metodo che colora i pannelli di bianco
+                ChangeColorToBlank(uiapp);
             }
             else
             {
-                // Transazione che attiva il view Template
-                using (Transaction trans = new Transaction(uiapp.ActiveUIDocument.Document))
-                {
-                    trans.Start("Change View Template to Blank");
-                    uiapp.ActiveUIDocument.Document.ActiveView.ViewTemplateId = templateId;
-                    trans.Commit();
-                }
+                ElementId templateId = viewTemplate.Id;
+                // Transazione che attiva il view Template LOD200
+                ApplyViewTemplateToActiveView(uiapp, templateId);
             }
-
             // Refresha la View attiva in modo da attivare il cambiamento
             uiapp.ActiveUIDocument.RefreshActiveView();
+        }
+
+
+        /// <summary>
+        /// Metodo per applicare il nuovo template
+        /// </summary>
+        public void ApplyViewTemplateToActiveView(UIApplication uiapp, ElementId viewTemplateId)
+        {
+            Document doc = uiapp.ActiveUIDocument.Document;
+
+            using (Transaction t = new Transaction(doc, "Set View Template"))
+            {
+                t.Start();
+                doc.ActiveView.ViewTemplateId = viewTemplateId;
+                t.Commit();
+            }
         }
 
         /// <summary>
@@ -647,7 +729,61 @@ namespace TypesSelector
         }
 
         /// <summary>
-        ///   Metodo che cambia il colore dei Pannelli
+        ///   Metodo che cambia il colore dei Pannelli nel colore BIANCO
+        /// </summary>
+        /// <remarks>
+        /// </remarks>
+        /// <param name="uiapp">L'oggetto Applicazione di Revit</param>m>
+        /// 
+        private void ChangeColorToBlank(UIApplication uiapp)
+        {
+            using (Transaction trans = new Transaction(uiapp.ActiveUIDocument.Document))
+            {
+                trans.Start("Change Color");
+
+                foreach (Element ele in _elements)
+                {
+                    // Metodo per la trasformazione del colore da System.Drawing.Color a Autodesk.Revit.DB.Color
+                    System.Drawing.Color colorToConvert = new System.Drawing.Color();
+                    colorToConvert = System.Drawing.Color.FromName("White");
+                    Autodesk.Revit.DB.Color newColor = new Autodesk.Revit.DB.Color(colorToConvert.R, colorToConvert.G, colorToConvert.B);
+
+                    // Assegna il nuovo colore all'elemento di override delle impostazioni grafiche
+
+                    _ogs.SetSurfaceForegroundPatternColor(newColor);
+                    _ogs.SetSurfaceForegroundPatternVisible(true);
+
+                    // Estrae il valore Id per settare il Pattern come Solid FIll(Riempimento)
+                    FilteredElementCollector elements = new FilteredElementCollector(uiapp.ActiveUIDocument.Document);
+                    FillPatternElement solidFillPattern = elements.OfClass(typeof(FillPatternElement))
+                        .Cast<FillPatternElement>()
+                        .First(a => a.GetFillPattern().IsSolidFill);
+                    ElementId solidFillPatternId = null;
+
+                    if (solidFillPattern.GetFillPattern().IsSolidFill)
+                    {
+                        solidFillPatternId = solidFillPattern.Id;
+                    }
+
+                    // Imposta l'elemento come Solid Fill
+                    _ogs.SetSurfaceForegroundPatternId(solidFillPatternId);
+
+                    // Fa l'override delle impostazioni grafiche dell'elemento
+                    uiapp.ActiveUIDocument.Document.ActiveView.SetElementOverrides(ele.Id, _ogs);
+                    //Autodesk.Revit.DB.Color colorForeground = el.Category.Material.SurfaceForegroundPatternColor;
+                    Autodesk.Revit.DB.Color colorForegroundOGS = _ogs.SurfaceForegroundPatternColor;
+                }              
+
+                trans.Commit();
+            }
+
+
+            //// Refresha la View attiva in modo da attivare il cambiamento
+            //uiapp.ActiveUIDocument.RefreshActiveView();
+        }
+
+            /// <summary>
+        ///   Metodo che cambia il colore dei Pannelli nel colore scelto
         /// </summary>
         /// <remarks>
         /// </remarks>
